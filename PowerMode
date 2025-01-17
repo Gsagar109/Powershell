@@ -1,0 +1,9 @@
+MOdule installation
+----------------------------------------------
+#Rename nupkg to zip
+#To extract zip file
+Expand-Archive .\speculationcontrol.1.0.18.zip -DestinationPath speculationcontrol -force
+#to import module
+Import-Module -name .\speculationcontrol
+#to copy module to powershell module path
+Copy-Item -Recurse .\speculationcontrol 'C:\Program Files\WindowsPowerShell\Modules'

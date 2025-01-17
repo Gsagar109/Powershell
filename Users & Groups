@@ -1,1 +1,23 @@
-All Users & Groups
+To get AD Groups members
+-------------------------------------------
+# Get Active Directory groups from a specific Organizational Unit
+$AD_Groups = gc .\list.txt
+# Search through AD_Groups variable and get AD group name and member user name
+$AD_Group_Members = foreach ($Group in $AD_Groups) {
+Get-ADGroupMember -Identity $Group -Recursive | Select-Object @{Name='Group';Expression={$Group}}, @{Name='Member';Expression={$_.Name}}
+}
+# Export groups and users to csv file from AD_Group_Members variable
+$AD_Group_Members | Export-Csv user.csv –NoTypeInformation
+
+
+To get OU Members
+-----------------------------------------------------------------------------------------------
+$results = Get-ADOrganizationalUnit -Properties CanonicalName -Filter * | Sort-Object CanonicalName |
+ForEach-Object {
+[pscustomobject]@{
+Name = Split-Path $_.CanonicalName -Leaf
+CanonicalName = $_.CanonicalName
+UserCount = @(Get-AdUser -Filter * -SearchBase $_.DistinguishedName -SearchScope OneLevel).Count
+ComputerCount = @(Get-AdComputer -Filter * -SearchBase $_.DistinguishedName -SearchScope OneLevel).Count
+}}
+$results | Out-File C:\Export_User_PC.txt -Encoding UTF8

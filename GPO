@@ -1,0 +1,18 @@
+To find gpo block
+-------------------------------
+$GPOsearchbase = "CN=Policies,CN=System," + (Get-ADRootDSE).rootDomainNamingContext
+write-host "Looking for GPOs that calls the Advanced Audit Policy CSE (F3CCC681-B74C-4060-9F26-CD84525DCA2A)..."
+get-adobject -filter * -searchbase $GPOsearchbase -Properties * | where {$_.gPCMachineExtensionNames -like '*F3CCC681-B74C-4060-9F26-CD84525DCA2A*' }  | % {
+$GptPath =  "$($_.gPCFileSysPath)\Machine\Microsoft\Windows NT\Audit\audit.csv"
+If (Get-ChildItem "$($_.gPCFileSysPath)\Machine\Microsoft\Windows NT\Audit\audit.csv" -ErrorAction SilentlyContinue) {
+Write-Host "Group Policy: " $_.DisplayNAme  "calls the CSE and has the audit.csv file on: " $_.gPCFileSysPath "\MACHINE\Microsoft\Windows NT\Audit" -ForegroundColor Green
+} Else {
+
+    Write-Host "Group Policy: " $_.DisplayName "calls the CSE, however the Audit.csv file is missing on: " $_.gPCFileSysPath "\MACHINE\Microsoft\Windows NT\Audit" -ForegroundColor red
+    write-host "1. Backup the GPO" -ForegroundColor Cyan
+    write-host "2. Open the following GPC: " $_.distinguishedName -ForegroundColor Cyan
+    write-host "3. Remove this CSE: [{F3CCC681-B74C-4060-9F26-CD84525DCA2A}{0F3F3735-573D-9804-99E4-AB2A69BA5FD4}]" -ForegroundColor Cyan
+    write-host "   From the gPCMachineExtensionNames attribute" -ForegroundColor Cyan
+    write-host "Current CSE list: " $_.gPCMachineExtensionNames-ForegroundColor Cyan
+    }
+}

@@ -1,0 +1,5 @@
+DNS DUMP
+CD C:\Windows\System32\dns
+MD C:\Windows\System32\dns\export\26092023
+dnscmd /enumzones > AllZones.txt
+for /f %a in (AllZones.txt) do dnscmd /ZoneExport %a export\26092023\%a.txt
